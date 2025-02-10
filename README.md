@@ -69,4 +69,19 @@ yarn dev
 bun dev
 ```
 
+## 🖼️ **Imagens do projeto em andamento**
+
+### *Lista de Contas*
+![image](https://github.com/user-attachments/assets/eab2b1e6-38a6-40a2-b45e-68824c4edf94)
+
+### *Inclusão de Conta*
+![image](https://github.com/user-attachments/assets/812d3b63-1309-4bc3-ada4-fa971add8ba5)
+
+### *Alteração de Conta*
+![image](https://github.com/user-attachments/assets/9136ce5f-4829-4f82-9945-e8d6df76debb)
+
+### *Exclusão de Conta*
+![image](https://github.com/user-attachments/assets/ea85979d-8450-4a95-a1ee-c25ad0fa9e61)
+
+### *Licença*
 Este projeto está licenciado sob a Licença MIT. Isso significa que você pode usar, modificar e distribuir este código livremente, desde que mantenha a atribuição original e inclua uma cópia da licença.
