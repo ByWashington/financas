@@ -69,6 +69,8 @@ yarn dev
 bun dev
 ```
 
+---
+
 ## 🖼️ **Imagens do projeto em andamento**
 
 ### *Lista de Contas*
@@ -82,6 +84,8 @@ bun dev
 
 ### *Exclusão de Conta*
 ![image](https://github.com/user-attachments/assets/ea85979d-8450-4a95-a1ee-c25ad0fa9e61)
+
+---
 
 ### *Licença*
 Este projeto está licenciado sob a Licença MIT. Isso significa que você pode usar, modificar e distribuir este código livremente, desde que mantenha a atribuição original e inclua uma cópia da licença.
