@@ -7,7 +7,7 @@ Este é um sistema completo para **gerenciamento de finanças pessoais**, permit
 ## 🚀 **Tecnologias Utilizadas**
 Este projeto foi desenvolvido com as seguintes tecnologias e bibliotecas:
 
-- **[Bun](https://bun.sh/)** – Bun é um runtime e kit de ferramentas JavaScript tudo em um, projetado para velocidade, completo com um bundler, um executor de testes e um gerenciador de pacotes compatível com Node.js
+- **[Bun](https://bun.sh/)** – Runtime alternativo ao Node.js, otimizando a execução do projeto com maior velocidade
 - **[Next.js](https://nextjs.org/)** – Framework React para desenvolvimento full-stack
 - **[TypeScript](https://www.typescriptlang.org/)** – Tipagem estática para um código mais seguro e escalável
 - **[ShadCN UI](https://ui.shadcn.com/)** – Biblioteca de componentes acessível e estilosa
