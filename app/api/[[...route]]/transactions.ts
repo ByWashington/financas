@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 
 import { db } from '@/db/drizzle'
-import { accounts, insertAccountSchema } from '@/db/schema'
+import { insertTransactionSchema, transactions } from '@/db/schema'
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
 import { zValidator } from '@hono/zod-validator'
 import { createId } from '@paralleldrive/cuid2'
@@ -18,11 +18,15 @@ const app = new Hono()
 
 		const data = await db
 			.select({
-				id: accounts.id,
-				name: accounts.name,
+				id: transactions.id,
+				name: transactions.name,
+				description: transactions.description,
+				price: transactions.price,
+				date: transactions.date,
+				document: transactions.document,
 			})
-			.from(accounts)
-			.where(eq(accounts.userId, auth.userId))
+			.from(transactions)
+			.where(eq(transactions.userId, auth.userId))
 
 		return c.json({ data })
 	})
@@ -45,16 +49,23 @@ const app = new Hono()
 			const { id } = c.req.valid('param')
 
 			if (!id) {
-				return c.json({ error: 'Not found' }, 404)
+				return c.json({ error: 'Not found' }, 400)
 			}
 
 			const [data] = await db
 				.select({
-					id: accounts.id,
-					name: accounts.name,
+					id: transactions.id,
+					name: transactions.name,
+					description: transactions.description,
+					price: transactions.price,
+					date: transactions.date,
+					category: transactions.category,
+					document: transactions.document,
 				})
-				.from(accounts)
-				.where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)))
+				.from(transactions)
+				.where(
+					and(eq(transactions.userId, auth.userId), eq(transactions.id, id)),
+				)
 
 			if (!data) {
 				return c.json({ error: 'Not found' }, 404)
@@ -68,8 +79,13 @@ const app = new Hono()
 		clerkMiddleware(),
 		zValidator(
 			'json',
-			insertAccountSchema.pick({
+			insertTransactionSchema.pick({
 				name: true,
+				description: true,
+				price: true,
+				date: true,
+				category: true,
+				document: true,
 			}),
 		),
 		async (c) => {
@@ -82,7 +98,7 @@ const app = new Hono()
 			const values = c.req.valid('json')
 
 			const [data] = await db
-				.insert(accounts)
+				.insert(transactions)
 				.values({
 					id: createId(),
 					userId: auth.userId,
@@ -112,15 +128,15 @@ const app = new Hono()
 			const values = c.req.valid('json')
 
 			const data = await db
-				.delete(accounts)
+				.delete(transactions)
 				.where(
 					and(
-						eq(accounts.userId, auth.userId),
-						inArray(accounts.id, values.ids),
+						eq(transactions.userId, auth.userId),
+						inArray(transactions.id, values.ids),
 					),
 				)
 				.returning({
-					id: accounts.id,
+					id: transactions.id,
 				})
 
 			return c.json({ data })
@@ -137,8 +153,13 @@ const app = new Hono()
 		),
 		zValidator(
 			'json',
-			insertAccountSchema.pick({
+			insertTransactionSchema.pick({
 				name: true,
+				description: true,
+				price: true,
+				date: true,
+				category: true,
+				document: true,
 			}),
 		),
 		async (c) => {
@@ -153,22 +174,24 @@ const app = new Hono()
 				const values = c.req.valid('json')
 
 				if (!id) {
-					return c.json({ error: 'Id não informado' }, 400)
+					return c.json({ error: 'Not found' }, 404)
 				}
 
 				const [data] = await db
-					.update(accounts)
+					.update(transactions)
 					.set(values)
-					.where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)))
+					.where(
+						and(eq(transactions.userId, auth.userId), eq(transactions.id, id)),
+					)
 					.returning()
 
 				if (!data) {
-					return c.json({ error: 'Conta não encontrada' }, 404)
+					return c.json({ error: 'Not found' }, 404)
 				}
 
 				return c.json({ data })
 			} catch (error) {
-				return c.json({ error: 'Erro interno no servidor' }, 500)
+				return c.json({ error: 'Internal server error' }, 500)
 			}
 		},
 	)
@@ -196,10 +219,12 @@ const app = new Hono()
 				}
 
 				const [data] = await db
-					.delete(accounts)
-					.where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)))
+					.delete(transactions)
+					.where(
+						and(eq(transactions.userId, auth.userId), eq(transactions.id, id)),
+					)
 					.returning({
-						id: accounts.id,
+						id: transactions.id,
 					})
 
 				if (!data) {
