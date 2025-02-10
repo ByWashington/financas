@@ -3,31 +3,25 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { InferRequestType, InferResponseType } from 'hono'
 import { toast } from 'sonner'
 
-type ResponseType = InferResponseType<
-	(typeof client.api.accounts)['bulk-delete']['$post']
->
+type ResponseType = InferResponseType<typeof client.api.transactions.$post>
 type RequestType = InferRequestType<
-	(typeof client.api.accounts)['bulk-delete']['$post']
+	typeof client.api.transactions.$post
 >['json']
 
-export const useBulkDeleteAccounts = () => {
+export const useCreateTransaction = () => {
 	const queryClient = useQueryClient()
 
 	const mutation = useMutation<ResponseType, Error, RequestType>({
 		mutationFn: async (json) => {
-			const response = await client.api.accounts['bulk-delete'].$post({
-				json,
-			})
+			const response = await client.api.transactions.$post({ json })
 			return await response.json()
 		},
 		onSuccess: () => {
-			toast.success('Exclusão realizada com sucesso!')
-			queryClient.invalidateQueries({ queryKey: ['accounts'] })
+			toast.success('Criado com sucesso!')
+			queryClient.invalidateQueries({ queryKey: ['transactions'] })
 		},
 		onError: () => {
-			toast.error(
-				'Erro ao tentar excluir o(s) registro(s), tente novamente mais tarde!',
-			)
+			toast.error('Erro tentar criar, tente novamente mais tarde!')
 		},
 	})
 
