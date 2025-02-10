@@ -42,7 +42,7 @@ yarn install
 bun install
 ```
 
-### 2️⃣ **Instalar dependências**
+### 2️⃣ **Gerar a Migração**
 ```bash
 npm run db:generate
 # ou
@@ -51,7 +51,7 @@ yarn db:generate
 bun run db:generate
 ```
 
-### 3️⃣ **Executar as Migrações do Banco**
+### 3️⃣ **Executar as Migrações no Banco**
 ```bash
 npm run db:migrate
 # ou
@@ -60,7 +60,7 @@ yarn db:migrate
 bun run db:migrate
 ```
 
-### 4️⃣ **Executar as Migrações do Banco**
+### 4️⃣ **Iniciar o projeto**
 ```bash
 npm run dev
 # ou
