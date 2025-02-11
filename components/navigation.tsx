@@ -2,7 +2,14 @@
 
 import NavButton from '@/components/nav-button'
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import {
+	Sheet,
+	SheetContent,
+	SheetDescription,
+	SheetHeader,
+	SheetTitle,
+	SheetTrigger,
+} from '@/components/ui/sheet'
 import { Menu } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
@@ -51,7 +58,7 @@ const Navigation = () => {
 	if (isMobile) {
 		return (
 			<Sheet open={isOpen} onOpenChange={setIsOpen}>
-				<SheetTrigger>
+				<SheetTrigger asChild>
 					<Button
 						variant="outline"
 						size="sm"
@@ -61,6 +68,10 @@ const Navigation = () => {
 					</Button>
 				</SheetTrigger>
 				<SheetContent side="left" className="px-2">
+					<SheetHeader>
+						<SheetTitle />
+						<SheetDescription />
+					</SheetHeader>
 					<nav className="flex flex-col gap-y-2 pt-6">
 						{routes.map((route) => (
 							<Button
