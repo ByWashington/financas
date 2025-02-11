@@ -1,25 +1,25 @@
 'use client'
 
-import { columns } from '@/app/(dashboard)/transactions/columns'
+import { columns } from '@/app/(dashboard)/categories/columns'
 import { DataTable } from '@/components/data-table'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useBulkDeleteTransactions } from '@/features/transactions/api/use-bulk-delete'
-import { useGetTransactions } from '@/features/transactions/api/use-get-transactions'
-import { useNewTransaction } from '@/features/transactions/hooks/use-new-transaction'
+import { useBulkDeleteCategories } from '@/features/categories/api/use-bulk-delete'
+import { useGetCategories } from '@/features/categories/api/use-get-categories'
+import { useNewCategory } from '@/features/categories/hooks/use-new-category'
 import { Loader2, Plus } from 'lucide-react'
 
-const TransactionsPage = () => {
-	const newTransaction = useNewTransaction()
-	const transactionsQuery = useGetTransactions()
-	const transactions = transactionsQuery.data || []
+const CategoriesPage = () => {
+	const newCategory = useNewCategory()
+	const categoriesQuery = useGetCategories()
+	const categories = categoriesQuery.data || []
 
-	const deleteTransactions = useBulkDeleteTransactions()
+	const deleteCategories = useBulkDeleteCategories()
 
-	const isDisabled = transactionsQuery.isLoading || deleteTransactions.isPending
+	const isDisabled = categoriesQuery.isLoading || deleteCategories.isPending
 
-	if (transactionsQuery.isLoading) {
+	if (categoriesQuery.isLoading) {
 		return (
 			<div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
 				<Card className="border-none drop-shadow-sm">
@@ -40,9 +40,10 @@ const TransactionsPage = () => {
 		<div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
 			<Card className="border-none drop-shadow-sm">
 				<CardHeader className="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
-					<CardTitle className="text-xl line-clamp-1">Transações</CardTitle>
-					<Button onClick={newTransaction.onOpen}>
-						<Plus className="size-4 mr-2" /> Adicionar
+					<CardTitle className="text-xl line-clamp-1">Categorias</CardTitle>
+					<Button onClick={newCategory.onOpen}>
+						<Plus className="size-4 mr-2" />
+						Adicionar
 					</Button>
 				</CardHeader>
 				<CardContent>
@@ -50,10 +51,10 @@ const TransactionsPage = () => {
 						filterKey="name"
 						filterDescription="Pesquisar por nome"
 						columns={columns}
-						data={transactions}
+						data={categories}
 						onDelete={(row) => {
 							const ids = row.map((r) => r.original.id)
-							deleteTransactions.mutate({ ids })
+							deleteCategories.mutate({ ids })
 						}}
 						disabled={isDisabled}
 					/>
@@ -63,4 +64,4 @@ const TransactionsPage = () => {
 	)
 }
 
-export default TransactionsPage
+export default CategoriesPage

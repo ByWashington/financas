@@ -4,27 +4,27 @@ import type { InferResponseType } from 'hono'
 import { toast } from 'sonner'
 
 type ResponseType = InferResponseType<
-	(typeof client.api.accounts)[':id']['$delete']
+	(typeof client.api.categories)[':id']['$delete']
 >
 
-export const useDeleteAccount = (id?: string) => {
+export const useDeleteCategory = (id?: string) => {
 	const queryClient = useQueryClient()
 
 	const mutation = useMutation<ResponseType, Error>({
 		mutationFn: async (json) => {
-			const response = await client.api.accounts[':id'].$delete({
+			const response = await client.api.categories[':id'].$delete({
 				param: { id },
 			})
 
 			return await response.json()
 		},
 		onSuccess: () => {
-			toast.success('Conta excluída com sucesso!')
-			queryClient.invalidateQueries({ queryKey: ['account', { id }] })
-			queryClient.invalidateQueries({ queryKey: ['accounts'] })
+			toast.success('Categoria excluída com sucesso!')
+			queryClient.invalidateQueries({ queryKey: ['category', { id }] })
+			queryClient.invalidateQueries({ queryKey: ['categories'] })
 		},
 		onError: () => {
-			toast.error('Erro ao excluir a conta, tente novamente mais tarde!')
+			toast.error('Erro ao excluir a categoria, tente novamente mais tarde!')
 		},
 	})
 

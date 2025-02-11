@@ -29,7 +29,7 @@ const NewAccountSheet = () => {
 				<SheetHeader>
 					<SheetTitle>Nova conta</SheetTitle>
 					<SheetDescription>
-						Criar uma nova conta e monitorar as suas transações
+						Crie uma nova conta e monitore as suas transações
 					</SheetDescription>
 				</SheetHeader>
 				<AccountForm

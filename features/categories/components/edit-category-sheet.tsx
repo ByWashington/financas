@@ -5,25 +5,25 @@ import {
 	SheetHeader,
 	SheetTitle,
 } from '@/components/ui/sheet'
-import { useDeleteAccount } from '@/features/accounts/api/use-delete-account'
-import { useEditAccount } from '@/features/accounts/api/use-edit-account'
-import { useGetAccount } from '@/features/accounts/api/use-get-account'
-import AccountForm from '@/features/accounts/components/account-form'
-import type { FormValues } from '@/features/accounts/components/account-form-values'
-import { useOpenAccount } from '@/features/accounts/hooks/use-open-account'
+import { useDeleteCategory } from '@/features/categories/api/use-delete-category'
+import { useEditCategory } from '@/features/categories/api/use-edit-category'
+import { useGetCategory } from '@/features/categories/api/use-get-category'
+import CategoryForm from '@/features/categories/components/category-form'
+import type { FormValues } from '@/features/categories/components/category-form-values'
+import { useOpenCategory } from '@/features/categories/hooks/use-open-category'
 import { useConfirm } from '@/hooks/use-confirm'
 import { Loader2 } from 'lucide-react'
 
-const EditAccountSheet = () => {
-	const { isOpen, onClose, id } = useOpenAccount()
+const EditCategorySheet = () => {
+	const { isOpen, onClose, id } = useOpenCategory()
 	const [ConfirmationDialog, confirm] = useConfirm(
 		'Você tem certeza?',
-		'Não será possível recuperar a conta',
+		'Não será possível recuperar a categoria',
 	)
 
-	const accountsQuery = useGetAccount(id)
-	const editMutation = useEditAccount(id)
-	const deleteMutation = useDeleteAccount(id)
+	const categoriesQuery = useGetCategory(id)
+	const editMutation = useEditCategory(id)
+	const deleteMutation = useDeleteCategory(id)
 
 	const isPending = editMutation.isPending || deleteMutation.isPending
 
@@ -47,11 +47,11 @@ const EditAccountSheet = () => {
 		}
 	}
 
-	const isLoading = accountsQuery.isLoading
+	const isLoading = categoriesQuery.isLoading
 
-	const defaultValues = accountsQuery.data
+	const defaultValues = categoriesQuery.data
 		? {
-				name: accountsQuery.data.name,
+				name: categoriesQuery.data.name,
 			}
 		: {
 				name: '',
@@ -63,9 +63,9 @@ const EditAccountSheet = () => {
 			<Sheet open={isOpen} onOpenChange={onClose}>
 				<SheetContent className="space-y-4">
 					<SheetHeader>
-						<SheetTitle>Alterar conta</SheetTitle>
+						<SheetTitle>Alterar categoria</SheetTitle>
 						<SheetDescription>
-							Gerencie as suas contas cadastradas
+							Gerencie as categorias das suas transações
 						</SheetDescription>
 					</SheetHeader>
 					{isLoading ? (
@@ -73,7 +73,7 @@ const EditAccountSheet = () => {
 							<Loader2 className="size-4 text-muted-foreground animate-spin" />
 						</div>
 					) : (
-						<AccountForm
+						<CategoryForm
 							onSubmit={onSubmit}
 							disabled={isPending}
 							defaultValues={defaultValues}
@@ -87,4 +87,4 @@ const EditAccountSheet = () => {
 	)
 }
 
-export default EditAccountSheet
+export default EditCategorySheet

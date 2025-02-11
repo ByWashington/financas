@@ -21,12 +21,11 @@ const app = new Hono()
 				id: transactions.id,
 				name: transactions.name,
 				description: transactions.description,
-				price: transactions.price,
+				price: transactions.amount,
 				date: transactions.date,
 				document: transactions.document,
 			})
 			.from(transactions)
-			.where(eq(transactions.userId, auth.userId))
 
 		return c.json({ data })
 	})
@@ -57,15 +56,13 @@ const app = new Hono()
 					id: transactions.id,
 					name: transactions.name,
 					description: transactions.description,
-					price: transactions.price,
+					price: transactions.amount,
 					date: transactions.date,
 					category: transactions.category,
 					document: transactions.document,
 				})
 				.from(transactions)
-				.where(
-					and(eq(transactions.userId, auth.userId), eq(transactions.id, id)),
-				)
+				.where(eq(transactions.id, id))
 
 			if (!data) {
 				return c.json({ error: 'Not found' }, 404)
@@ -82,10 +79,11 @@ const app = new Hono()
 			insertTransactionSchema.pick({
 				name: true,
 				description: true,
-				price: true,
+				amount: true,
 				date: true,
-				category: true,
 				document: true,
+				categoryId: true,
+				accountId: true,
 			}),
 		),
 		async (c) => {
@@ -101,7 +99,6 @@ const app = new Hono()
 				.insert(transactions)
 				.values({
 					id: createId(),
-					userId: auth.userId,
 					...values,
 				})
 				.returning()
@@ -129,12 +126,7 @@ const app = new Hono()
 
 			const data = await db
 				.delete(transactions)
-				.where(
-					and(
-						eq(transactions.userId, auth.userId),
-						inArray(transactions.id, values.ids),
-					),
-				)
+				.where(inArray(transactions.id, values.ids))
 				.returning({
 					id: transactions.id,
 				})
@@ -156,7 +148,7 @@ const app = new Hono()
 			insertTransactionSchema.pick({
 				name: true,
 				description: true,
-				price: true,
+				amount: true,
 				date: true,
 				category: true,
 				document: true,
@@ -180,9 +172,7 @@ const app = new Hono()
 				const [data] = await db
 					.update(transactions)
 					.set(values)
-					.where(
-						and(eq(transactions.userId, auth.userId), eq(transactions.id, id)),
-					)
+					.where(eq(transactions.id, id))
 					.returning()
 
 				if (!data) {
@@ -220,9 +210,7 @@ const app = new Hono()
 
 				const [data] = await db
 					.delete(transactions)
-					.where(
-						and(eq(transactions.userId, auth.userId), eq(transactions.id, id)),
-					)
+					.where(eq(transactions.id, id))
 					.returning({
 						id: transactions.id,
 					})

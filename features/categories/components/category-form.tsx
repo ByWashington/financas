@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 import {
 	type FormValues,
 	formSchema,
-} from '@/features/accounts/components/account-form-values'
+} from '@/features/categories/components/category-form-values'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash } from 'lucide-react'
 import { useForm } from 'react-hook-form'
@@ -23,7 +23,7 @@ type Props = {
 	disabled?: boolean
 }
 
-const AccountForm = ({
+const CategoryForm = ({
 	id,
 	defaultValues,
 	onSubmit,
@@ -58,7 +58,7 @@ const AccountForm = ({
 							<FormControl>
 								<Input
 									disabled={disabled}
-									placeholder="Santander, Itaú, Bradesco..."
+									placeholder="Shopping, Transporte, Mercado..."
 									{...field}
 								/>
 							</FormControl>
@@ -87,4 +87,4 @@ const AccountForm = ({
 	)
 }
 
-export default AccountForm
+export default CategoryForm
