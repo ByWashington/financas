@@ -3,7 +3,7 @@
 import NavButton from '@/components/nav-button'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
-import { Menu, MenuIcon } from 'lucide-react'
+import { Menu } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -11,12 +11,16 @@ import { useMedia } from 'react-use'
 
 const routes = [
 	{
-		href: '/',
-		label: 'Dashboard',
-	},
-	{
 		href: '/transactions',
 		label: 'Transações',
+	},
+	{
+		href: '/expenses',
+		label: 'Despesas',
+	},
+	{
+		href: '/income',
+		label: 'Receita',
 	},
 	{
 		href: '/accounts',

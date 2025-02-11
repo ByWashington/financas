@@ -1,34 +1,75 @@
 import { Hono } from 'hono'
 
 import { db } from '@/db/drizzle'
-import { insertTransactionSchema, transactions } from '@/db/schema'
+import {
+	accounts,
+	categories,
+	insertTransactionSchema,
+	transactions,
+} from '@/db/schema'
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
 import { zValidator } from '@hono/zod-validator'
 import { createId } from '@paralleldrive/cuid2'
-import { and, eq, inArray } from 'drizzle-orm'
+import { parse, subDays } from 'date-fns'
+import { and, desc, eq, gte, inArray, lte, sql } from 'drizzle-orm'
 import { z } from 'zod'
 
 const app = new Hono()
-	.get('/', clerkMiddleware(), async (c) => {
-		const auth = getAuth(c)
+	.get(
+		'/',
+		clerkMiddleware(),
+		zValidator(
+			'query',
+			z.object({
+				from: z.string().optional(),
+				to: z.string().optional(),
+				accountId: z.string().optional(),
+			}),
+		),
+		async (c) => {
+			const auth = getAuth(c)
 
-		if (!auth?.userId) {
-			return c.json({ error: 'Unauthorized' }, 401)
-		}
+			if (!auth?.userId) {
+				return c.json({ error: 'Unauthorized' }, 401)
+			}
 
-		const data = await db
-			.select({
-				id: transactions.id,
-				name: transactions.name,
-				description: transactions.description,
-				price: transactions.amount,
-				date: transactions.date,
-				document: transactions.document,
-			})
-			.from(transactions)
+			const { from, to, accountId } = c.req.valid('query')
+			const defaultTo = new Date()
+			const defaultFrom = subDays(defaultTo, 30)
 
-		return c.json({ data })
-	})
+			const startDate = from
+				? parse(from, 'yyy-MM-dd', new Date())
+				: defaultFrom
+			const endDate = to ? parse(to, 'yyy-MM-dd', new Date()) : defaultTo
+
+			const data = await db
+				.select({
+					id: transactions.id,
+					name: transactions.name,
+					description: transactions.description,
+					amount: transactions.amount,
+					date: transactions.date,
+					document: transactions.document,
+					category: categories.name,
+					categoryId: transactions.categoryId,
+					account: accounts.name,
+					accountId: transactions.accountId,
+				})
+				.from(transactions)
+				.innerJoin(accounts, eq(transactions.accountId, accounts.id))
+				.leftJoin(categories, eq(transactions.categoryId, categories.id))
+				.where(
+					and(
+						accountId ? eq(transactions.accountId, accountId) : undefined,
+						gte(transactions.date, startDate),
+						lte(transactions.date, endDate),
+					),
+				)
+				.orderBy(desc(transactions.date))
+
+			return c.json({ data })
+		},
+	)
 	.get(
 		'/:id',
 		zValidator(
@@ -56,12 +97,14 @@ const app = new Hono()
 					id: transactions.id,
 					name: transactions.name,
 					description: transactions.description,
-					price: transactions.amount,
+					amount: transactions.amount,
 					date: transactions.date,
-					category: transactions.category,
 					document: transactions.document,
+					categoryId: transactions.categoryId,
+					accountId: transactions.accountId,
 				})
 				.from(transactions)
+				.innerJoin(accounts, eq(transactions.accountId, accounts.id))
 				.where(eq(transactions.id, id))
 
 			if (!data) {
@@ -76,14 +119,8 @@ const app = new Hono()
 		clerkMiddleware(),
 		zValidator(
 			'json',
-			insertTransactionSchema.pick({
-				name: true,
-				description: true,
-				amount: true,
-				date: true,
-				document: true,
-				categoryId: true,
-				accountId: true,
+			insertTransactionSchema.omit({
+				id: true,
 			}),
 		),
 		async (c) => {
@@ -123,10 +160,25 @@ const app = new Hono()
 			}
 
 			const values = c.req.valid('json')
+			const transactionsToDelete = db
+				.$with('transactions_to_delete')
+				.as(
+					db
+						.select({ id: transactions.id })
+						.from(transactions)
+						.innerJoin(accounts, eq(transactions.accountId, accounts.id))
+						.where(inArray(transactions.id, values.ids)),
+				)
 
 			const data = await db
+				.with(transactionsToDelete)
 				.delete(transactions)
-				.where(inArray(transactions.id, values.ids))
+				.where(
+					inArray(
+						transactions.id,
+						sql`(select id from ${transactionsToDelete})`,
+					),
+				)
 				.returning({
 					id: transactions.id,
 				})
@@ -145,13 +197,8 @@ const app = new Hono()
 		),
 		zValidator(
 			'json',
-			insertTransactionSchema.pick({
-				name: true,
-				description: true,
-				amount: true,
-				date: true,
-				category: true,
-				document: true,
+			insertTransactionSchema.omit({
+				id: true,
 			}),
 		),
 		async (c) => {
@@ -169,10 +216,26 @@ const app = new Hono()
 					return c.json({ error: 'Not found' }, 404)
 				}
 
+				const transactionsToUpdate = db
+					.$with('transactions_to_update')
+					.as(
+						db
+							.select({ id: transactions.id })
+							.from(transactions)
+							.innerJoin(accounts, eq(transactions.accountId, accounts.id))
+							.where(eq(transactions.id, id)),
+					)
+
 				const [data] = await db
+					.with(transactionsToUpdate)
 					.update(transactions)
 					.set(values)
-					.where(eq(transactions.id, id))
+					.where(
+						inArray(
+							transactions.id,
+							sql`(select id from ${transactionsToUpdate})`,
+						),
+					)
 					.returning()
 
 				if (!data) {
@@ -208,9 +271,25 @@ const app = new Hono()
 					return c.json({ error: 'Not found' }, 404)
 				}
 
+				const transactionsToDelete = db
+					.$with('transactions_to_delete')
+					.as(
+						db
+							.select({ id: transactions.id })
+							.from(transactions)
+							.innerJoin(accounts, eq(transactions.accountId, accounts.id))
+							.where(eq(transactions.id, id)),
+					)
+
 				const [data] = await db
+					.with(transactionsToDelete)
 					.delete(transactions)
-					.where(eq(transactions.id, id))
+					.where(
+						inArray(
+							transactions.id,
+							sql`(select id from ${transactionsToDelete})`,
+						),
+					)
 					.returning({
 						id: transactions.id,
 					})

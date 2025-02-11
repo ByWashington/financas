@@ -27,9 +27,9 @@ const NewCategorySheet = () => {
 		<Sheet open={isOpen} onOpenChange={onClose}>
 			<SheetContent className="space-y-4">
 				<SheetHeader>
-					<SheetTitle>Nova categoria</SheetTitle>
+					<SheetTitle>Adicionar</SheetTitle>
 					<SheetDescription>
-						Crie uma nova categoria e use para categorizar suas transações
+						Adicione uma nova categoria e use para categorizar suas transações
 					</SheetDescription>
 				</SheetHeader>
 				<CategoryForm

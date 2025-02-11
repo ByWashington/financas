@@ -5,11 +5,18 @@ import {
 	SheetHeader,
 	SheetTitle,
 } from '@/components/ui/sheet'
+import { useCreateAccount } from '@/features/accounts/api/use-create-account'
+import { useGetAccounts } from '@/features/accounts/api/use-get-accounts'
+import { useCreateCategory } from '@/features/categories/api/use-create-category'
+import { useGetCategories } from '@/features/categories/api/use-get-categories'
 import { useDeleteTransaction } from '@/features/transactions/api/use-delete-transaction'
 import { useEditTransaction } from '@/features/transactions/api/use-edit-transaction'
 import { useGetTransaction } from '@/features/transactions/api/use-get-transaction'
 import TransactionForm from '@/features/transactions/components/transaction-form'
-import type { FormValues } from '@/features/transactions/components/transaction-form-values'
+import type {
+	ApiFormValues,
+	FormValues,
+} from '@/features/transactions/components/transaction-form-values'
 import { useOpenTransaction } from '@/features/transactions/hooks/use-open-transaction'
 import { useConfirm } from '@/hooks/use-confirm'
 import { Loader2 } from 'lucide-react'
@@ -25,9 +32,29 @@ const EditTransactionSheet = () => {
 	const editMutation = useEditTransaction(id)
 	const deleteMutation = useDeleteTransaction(id)
 
-	const isPending = editMutation.isPending || deleteMutation.isPending
+	const categoryQuery = useGetCategories()
+	const categoryMutation = useCreateCategory()
+	const onCreateCategory = (name: string) => categoryMutation.mutate({ name })
+	const categoryOptions = (categoryQuery.data ?? []).map((category) => ({
+		label: category.name,
+		value: category.id,
+	}))
 
-	const onSubmit = (values: FormValues) => {
+	const accountQuery = useGetAccounts()
+	const accountMutation = useCreateAccount()
+	const onCreateAccount = (name: string) => accountMutation.mutate({ name })
+	const accountOptions = (accountQuery.data ?? []).map((account) => ({
+		label: account.name,
+		value: account.id,
+	}))
+
+	const isPending =
+		editMutation.isPending ||
+		deleteMutation.isPending ||
+		categoryMutation.isPending ||
+		accountMutation.isPending
+
+	const onSubmit = (values: ApiFormValues) => {
 		editMutation.mutate(values, {
 			onSuccess: () => {
 				onClose()
@@ -47,25 +74,24 @@ const EditTransactionSheet = () => {
 		}
 	}
 
-	const isLoading = transactionsQuery.isLoading
+	const isLoading =
+		transactionsQuery.isLoading ||
+		categoryQuery.isLoading ||
+		accountQuery.isLoading
 
-	const defaultValues = transactionsQuery.data
-		? {
-				name: transactionsQuery.data.name,
-				description: transactionsQuery.data.description,
-				date: transactionsQuery.data.date,
-				category: transactionsQuery.data.category,
-				price: transactionsQuery.data.price,
-				document: transactionsQuery.data.document,
-			}
-		: {
-				name: '',
-				description: '',
-				date: '',
-				category: '',
-				price: '',
-				document: '',
-			}
+	if (!transactionsQuery || !transactionsQuery.data) {
+		return null
+	}
+
+	const defaultValues = {
+		name: transactionsQuery.data.name,
+		description: transactionsQuery.data.description,
+		date: new Date(transactionsQuery.data.date),
+		amount: transactionsQuery.data.amount.toString(),
+		document: transactionsQuery.data.document,
+		categoryId: transactionsQuery.data.categoryId,
+		accountId: transactionsQuery.data.accountId,
+	}
 
 	console.log(defaultValues.date)
 
@@ -77,7 +103,7 @@ const EditTransactionSheet = () => {
 					<SheetHeader>
 						<SheetTitle>Alterar</SheetTitle>
 						<SheetDescription>
-							Gerencie as suas contas cadastradas
+							Gerencie as suas transações cadastradas
 						</SheetDescription>
 					</SheetHeader>
 					{isLoading ? (
@@ -91,6 +117,10 @@ const EditTransactionSheet = () => {
 							defaultValues={defaultValues}
 							id={id}
 							onDelete={onDelete}
+							categoryOptions={categoryOptions}
+							onCreateCategory={onCreateCategory}
+							accountOptions={accountOptions}
+							onCreateAccount={onCreateAccount}
 						/>
 					)}
 				</SheetContent>

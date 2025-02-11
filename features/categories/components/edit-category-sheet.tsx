@@ -63,7 +63,7 @@ const EditCategorySheet = () => {
 			<Sheet open={isOpen} onOpenChange={onClose}>
 				<SheetContent className="space-y-4">
 					<SheetHeader>
-						<SheetTitle>Alterar categoria</SheetTitle>
+						<SheetTitle>Alterar</SheetTitle>
 						<SheetDescription>
 							Gerencie as categorias das suas transações
 						</SheetDescription>

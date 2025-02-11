@@ -3,16 +3,26 @@
 import { Actions } from '@/app/(dashboard)/transactions/actions'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
+import {
+	convertAmountFromMiliunits,
+	convertAmountToMiliunits,
+	formatCurrency,
+} from '@/lib/utils'
 import type { ColumnDef } from '@tanstack/react-table'
+import { format } from 'date-fns'
 import { ArrowUpDown } from 'lucide-react'
 
 export const columns: ColumnDef<{
 	id: string
 	name: string
-	description: string
-	price: string
+	description: string | null
+	amount: number
 	date: string
-	document: string
+	document: string | null
+	category: string | null
+	categoryId: string | null
+	account: string
+	accountId: string
 }>[] = [
 	{
 		id: 'select',
@@ -51,7 +61,7 @@ export const columns: ColumnDef<{
 		},
 	},
 	{
-		accessorKey: 'price',
+		accessorKey: 'amount',
 		header: ({ column }) => {
 			return (
 				<Button
@@ -62,6 +72,9 @@ export const columns: ColumnDef<{
 					<ArrowUpDown className="ml-2 h-4 w-4" />
 				</Button>
 			)
+		},
+		cell: ({ row }) => {
+			return <span>{formatCurrency(row.original.amount)}</span>
 		},
 	},
 	{
@@ -76,6 +89,11 @@ export const columns: ColumnDef<{
 					<ArrowUpDown className="ml-2 h-4 w-4" />
 				</Button>
 			)
+		},
+		cell: ({ row }) => {
+			const date = row.getValue('date') as Date
+
+			return <span>{format(date, 'dd/MM/yyyy')}</span>
 		},
 	},
 	{

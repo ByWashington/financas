@@ -22,7 +22,7 @@ export const transactions = pgTable('transactions', {
 	amount: integer('amount').notNull(),
 	date: timestamp('date', { mode: 'date' }).notNull(),
 	category: text('category'),
-	document: text('document').notNull(),
+	document: text('document'),
 	accountId: text('account_id')
 		.references(() => accounts.id, {
 			onDelete: 'cascade',

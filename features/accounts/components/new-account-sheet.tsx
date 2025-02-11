@@ -27,9 +27,9 @@ const NewAccountSheet = () => {
 		<Sheet open={isOpen} onOpenChange={onClose}>
 			<SheetContent className="space-y-4">
 				<SheetHeader>
-					<SheetTitle>Nova conta</SheetTitle>
+					<SheetTitle>Adicionar</SheetTitle>
 					<SheetDescription>
-						Crie uma nova conta e monitore as suas transações
+						Adicione uma nova conta e monitore as suas transações
 					</SheetDescription>
 				</SheetHeader>
 				<AccountForm

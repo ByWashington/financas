@@ -102,7 +102,7 @@ export function DataTable<TData, TValue>({
 						}}
 					>
 						<Trash className="size-4 mr-2" />
-						Excluir ({table.getFilteredRowModel().rows.length})
+						Excluir ({table.getSelectedRowModel().rows.length})
 					</Button>
 				)}
 			</div>

@@ -1,3 +1,6 @@
+import { AmountInput } from '@/components/amount-input'
+import { DatePicker } from '@/components/date-picker'
+import { Select } from '@/components/select'
 import { Button } from '@/components/ui/button'
 import {
 	Form,
@@ -8,21 +11,25 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import {
+	type ApiFormValues,
 	type FormValues,
 	formSchema,
 } from '@/features/transactions/components/transaction-form-values'
+import { convertAmountToMiliunits } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { format, formatDate, parse, setDate } from 'date-fns'
 import { Trash } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import type { date } from 'zod'
 
 type Props = {
 	id?: string
 	defaultValues?: FormValues
-	onSubmit: (values: FormValues) => void
+	onSubmit: (values: ApiFormValues) => void
 	onDelete?: () => void
 	disabled?: boolean
+	accountOptions: { label: string; value: string }[]
+	onCreateAccount: (name: string) => void
+	categoryOptions: { label: string; value: string }[]
+	onCreateCategory: (name: string) => void
 }
 
 const TransactionForm = ({
@@ -31,6 +38,10 @@ const TransactionForm = ({
 	onSubmit,
 	onDelete,
 	disabled,
+	accountOptions,
+	onCreateAccount,
+	categoryOptions,
+	onCreateCategory,
 }: Props) => {
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
@@ -38,8 +49,13 @@ const TransactionForm = ({
 	})
 
 	const handleSubmit = (values: FormValues) => {
-		console.log(values)
-		onSubmit(values)
+		const amount = Number.parseFloat(values.amount)
+		const amountInMiliunits = convertAmountToMiliunits(amount)
+
+		onSubmit({
+			...values,
+			amount: amountInMiliunits,
+		})
 	}
 
 	const handleDelete = () => {
@@ -77,9 +93,10 @@ const TransactionForm = ({
 							<FormLabel>Descrição</FormLabel>
 							<FormControl>
 								<Input
+									{...field}
+									value={field.value ?? ''}
 									disabled={disabled}
 									placeholder="Conta de internet do mês de janeiro..."
-									{...field}
 								/>
 							</FormControl>
 						</FormItem>
@@ -87,40 +104,91 @@ const TransactionForm = ({
 				/>
 
 				<FormField
-					name="price"
+					name="accountId"
+					control={form.control}
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Conta</FormLabel>
+							<FormControl>
+								<Select
+									placeholder="Seleciona uma conta"
+									options={accountOptions}
+									onCreate={onCreateAccount}
+									value={field.value}
+									onChange={field.onChange}
+								/>
+							</FormControl>
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					name="amount"
 					control={form.control}
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Valor</FormLabel>
 							<FormControl>
-								<Input disabled={disabled} {...field} />
+								<AmountInput
+									{...field}
+									disabled={disabled}
+									placeholder="R$ 0,00"
+								/>
 							</FormControl>
 						</FormItem>
 					)}
 				/>
+
 				<FormField
 					control={form.control}
 					name="date"
 					render={({ field }) => (
-						<FormItem className="flex w-72 flex-col gap-2">
-							<FormLabel>Data</FormLabel>
+						<FormItem>
 							<FormControl>
-								<Input disabled={disabled}  {...field} />
+								<DatePicker
+									value={field.value}
+									onChange={(x) => {
+										field.onChange(x)
+									}}
+									disabled={disabled}
+									placeholder="Data de pagamento"
+								/>
 							</FormControl>
 						</FormItem>
 					)}
 				/>
+
 				<FormField
-					name="category"
+					name="categoryId"
 					control={form.control}
 					render={({ field }) => (
 						<FormItem>
 							<FormLabel>Categoria</FormLabel>
 							<FormControl>
+								<Select
+									placeholder="Seleciona uma categoria"
+									options={categoryOptions}
+									onCreate={onCreateCategory}
+									value={field.value}
+									onChange={field.onChange}
+								/>
+							</FormControl>
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					name="document"
+					control={form.control}
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Comprovante</FormLabel>
+							<FormControl>
 								<Input
-									disabled={disabled}
-									placeholder="Essenciais..."
 									{...field}
+									value={field.value ?? ''}
+									disabled={disabled}
+									placeholder="URL do documento"
 								/>
 							</FormControl>
 						</FormItem>
@@ -128,7 +196,7 @@ const TransactionForm = ({
 				/>
 
 				<Button className="w-full" disabled={disabled}>
-					{id ? 'Salvar alterações' : 'Criar transação'}
+					{id ? 'Salvar' : 'Adicionar'}
 				</Button>
 
 				{!!id && (
@@ -141,7 +209,7 @@ const TransactionForm = ({
 						variant="outline"
 					>
 						<Trash className="size-4 mr-2" />
-						Excluir transação
+						Excluir
 					</Button>
 				)}
 			</form>
