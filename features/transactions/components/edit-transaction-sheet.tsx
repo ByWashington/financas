@@ -93,8 +93,6 @@ const EditTransactionSheet = () => {
 		accountId: transactionsQuery.data.accountId,
 	}
 
-	console.log(defaultValues.date)
-
 	return (
 		<>
 			<ConfirmationDialog />
