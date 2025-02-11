@@ -22,7 +22,8 @@ Este projeto foi desenvolvido com as seguintes tecnologias e bibliotecas:
 ## 📌 **To-do das Funcionalidades Planejadas**
 - [X] **Autenticação do usuário**
 - [X] **Cadastro de contas**
-- [ ] **Cadastro de transações**
+- [x] **Cadastro de categorias**
+- [x] **Cadastro de transações**
 - [ ] **Cadastro de despesas**
 - [ ] **Cadastro de receitas**
 - [ ] **Configurações de usuário**
