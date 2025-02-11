@@ -14,6 +14,7 @@ Este projeto foi desenvolvido com as seguintes tecnologias e bibliotecas:
 - **[Tailwind CSS](https://tailwindcss.com/)** – Framework utilitário para estilização moderna e responsiva
 - **[Clerk](https://clerk.com/)** – Gerenciamento de autenticação e usuários de forma segura e integrada
 - **[HonoJS](https://hono.dev/)** – Framework ultra rápido para APIs e back-end
+- **[Drizzle ORM](https://orm.drizzle.team/)** – ORM moderno e rápido para TypeScript e PostgreSQL.
 - **[PostgreSQL](https://www.postgresql.org/)** – Banco de dados relacional confiável e escalável
 - **[React Hook Form](https://react-hook-form.com/)** – Biblioteca para manipulação de formulários de forma eficiente
 
