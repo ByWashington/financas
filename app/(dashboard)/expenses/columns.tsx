@@ -1,13 +1,9 @@
 'use client'
 
-import { Actions } from '@/app/(dashboard)/transactions/actions'
+import { Actions } from '@/app/(dashboard)/expenses/actions'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-	convertAmountFromMiliunits,
-	convertAmountToMiliunits,
-	formatCurrency,
-} from '@/lib/utils'
+import { formatCurrency } from '@/lib/utils'
 import type { ColumnDef } from '@tanstack/react-table'
 import { format } from 'date-fns'
 import { ArrowUpDown } from 'lucide-react'
@@ -18,13 +14,8 @@ export const columns: ColumnDef<{
 	description: string | null
 	amount: number
 	date: string
-	document: string | null
 	category: string | null
 	categoryId: string | null
-	account: string
-	accountId: string
-	expense: string | null
-	expenseId: string | null
 }>[] = [
 	{
 		id: 'select',
@@ -97,10 +88,6 @@ export const columns: ColumnDef<{
 
 			return <span>{format(date, 'dd/MM/yyyy')}</span>
 		},
-	},
-	{
-		accessorKey: 'document',
-		header: 'Comprovante',
 	},
 	{
 		id: 'actions',

@@ -1,4 +1,3 @@
-import { transactions } from '@/db/schema'
 import { client } from '@/lib/hono'
 import { convertAmountFromMiliunits } from '@/lib/utils'
 import { useQuery } from '@tanstack/react-query'

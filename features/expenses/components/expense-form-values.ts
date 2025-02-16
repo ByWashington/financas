@@ -1,4 +1,4 @@
-import { insertTransactionSchema } from '@/db/schema'
+import { insertExpenseSchema } from '@/db/schema'
 import { z } from 'zod'
 
 const formSchema = z.object({
@@ -6,13 +6,14 @@ const formSchema = z.object({
 	description: z.string().nullable().optional(),
 	amount: z.string(),
 	date: z.coerce.date(),
-	document: z.string().nullable().optional(),
+	currentInstallment: z.string().nullable().optional(),
+	numberInstallments: z.string().nullable().optional(),
+	isEternal: z.string(),
+	isActive: z.string(),
 	categoryId: z.string().nullable().optional(),
-	accountId: z.string(),
-	expenseId: z.string().nullable().optional(),
 })
 
-const apiSchema = insertTransactionSchema.omit({
+const apiSchema = insertExpenseSchema.omit({
 	id: true,
 })
 

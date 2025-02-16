@@ -11,6 +11,7 @@ type Props = {
 	value?: string | null | undefined
 	disabled?: boolean
 	placeholder?: string
+	disableCreateNew?: boolean
 }
 
 export const Select = ({
@@ -20,6 +21,7 @@ export const Select = ({
 	onCreate,
 	options = [],
 	placeholder,
+	disableCreateNew,
 }: Props) => {
 	const onSelect = (options: SingleValue<{ label: string; value: string }>) => {
 		onChange(options?.value)
@@ -48,6 +50,9 @@ export const Select = ({
 			onCreateOption={onCreate}
 			formatCreateLabel={(inputValue) => `Adicionar "${inputValue}"`}
 			isDisabled={disabled}
+			noOptionsMessage={() => <p>Nenhuma opção</p>}
+			{...(disableCreateNew ? { isValidNewOption: () => false } : {})}
+			isClearable={true}
 		/>
 	)
 }

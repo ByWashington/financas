@@ -25,7 +25,7 @@ Este projeto foi desenvolvido com as seguintes tecnologias e bibliotecas:
 - [X] **Cadastro de contas**
 - [x] **Cadastro de categorias**
 - [x] **Cadastro de transações**
-- [ ] **Cadastro de despesas**
+- [x] **Cadastro de despesas**
 - [ ] **Cadastro de receitas**
 - [ ] **Configurações de usuário**
 - [ ] **Dashboard de finanças**

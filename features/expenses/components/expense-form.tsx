@@ -2,24 +2,24 @@ import { AmountInput } from '@/components/amount-input'
 import { DatePicker } from '@/components/date-picker'
 import { Select } from '@/components/select'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import {
 	Form,
 	FormControl,
 	FormField,
 	FormItem,
 	FormLabel,
+	FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { useGetExpense } from '@/features/expenses/api/use-get-expense'
 import {
 	type ApiFormValues,
 	type FormValues,
 	formSchema,
-} from '@/features/transactions/components/transaction-form-values'
-import { convertAmountToMiliunits } from '@/lib/utils'
+} from '@/features/expenses/components/expense-form-values'
+import { convertAmountToMiliunits, convertStringToBoolean } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash } from 'lucide-react'
-import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 
 type Props = {
@@ -28,47 +28,36 @@ type Props = {
 	onSubmit: (values: ApiFormValues) => void
 	onDelete?: () => void
 	disabled?: boolean
-	accountOptions: { label: string; value: string }[]
-	onCreateAccount: (name: string) => void
 	categoryOptions: { label: string; value: string }[]
 	onCreateCategory: (name: string) => void
-	expenseOptions: { label: string; value: string }[]
 }
 
-const TransactionForm = ({
+const ExpenseForm = ({
 	id,
 	defaultValues,
 	onSubmit,
 	onDelete,
 	disabled,
-	accountOptions,
-	onCreateAccount,
 	categoryOptions,
 	onCreateCategory,
-	expenseOptions,
 }: Props) => {
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
-		defaultValues: defaultValues ?? {
-			expenseId: '',
-			name: '',
-			description: '',
-			accountId: '',
-			amount: '',
-			date: new Date(),
-			categoryId: '',
-			document: '',
-		},
+		defaultValues: defaultValues,
 	})
-	const expenseId = form.watch('expenseId')
-	const expenseQuery = useGetExpense(expenseId ?? '')
 
 	const handleSubmit = (values: FormValues) => {
 		const amount = Number.parseFloat(values.amount)
 		const amountInMiliunits = convertAmountToMiliunits(amount)
 
+		console.log('aqi')
+
 		onSubmit({
 			...values,
+			currentInstallment: Number.parseFloat(values.currentInstallment ?? '0'),
+			numberInstallments: Number.parseFloat(values.numberInstallments ?? '0'),
+			isEternal: convertStringToBoolean(values.isEternal),
+			isActive: convertStringToBoolean(values.isActive),
 			amount: amountInMiliunits,
 		})
 	}
@@ -77,42 +66,12 @@ const TransactionForm = ({
 		onDelete?.()
 	}
 
-	useEffect(() => {
-		if (expenseQuery.data) {
-			const data = expenseQuery.data
-			const name = `${data.name}${(data.numberInstallments ?? 0) > 0 ? ` - ${(data.currentInstallment ?? 0) + 1}/${data.numberInstallments}` : ''}`
-
-			form.setValue('name', name)
-			form.setValue('amount', `${data.amount}`)
-			form.setValue('categoryId', `${data.categoryId}`)
-		}
-	}, [expenseQuery.data, form])
-
 	return (
 		<Form {...form}>
 			<form
 				onSubmit={form.handleSubmit(handleSubmit)}
 				className="space-y-4 pt-4"
 			>
-				<FormField
-					name="expenseId"
-					control={form.control}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Despesa</FormLabel>
-							<FormControl>
-								<Select
-									placeholder="Seleciona uma despesa"
-									options={expenseOptions}
-									value={field.value ?? ''}
-									onChange={field.onChange}
-									disableCreateNew={true}
-								/>
-							</FormControl>
-						</FormItem>
-					)}
-				/>
-
 				<FormField
 					name="name"
 					control={form.control}
@@ -121,9 +80,10 @@ const TransactionForm = ({
 							<FormLabel>Name</FormLabel>
 							<FormControl>
 								<Input
+									{...field}
+									value={field.value ?? ''}
 									disabled={disabled}
 									placeholder="Conta de internet..."
-									{...field}
 								/>
 							</FormControl>
 						</FormItem>
@@ -142,25 +102,6 @@ const TransactionForm = ({
 									value={field.value ?? ''}
 									disabled={disabled}
 									placeholder="Conta de internet do mês de janeiro..."
-								/>
-							</FormControl>
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					name="accountId"
-					control={form.control}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Conta</FormLabel>
-							<FormControl>
-								<Select
-									placeholder="Seleciona uma conta"
-									options={accountOptions}
-									onCreate={onCreateAccount}
-									value={field.value}
-									onChange={field.onChange}
 								/>
 							</FormControl>
 						</FormItem>
@@ -203,6 +144,84 @@ const TransactionForm = ({
 					)}
 				/>
 
+				<div className="flex flex-row gap-4">
+					<FormField
+						name="currentInstallment"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Parcela atual</FormLabel>
+								<FormControl>
+									<Input
+										{...field}
+										value={field.value ?? ''}
+										disabled={disabled}
+										type="number"
+									/>
+								</FormControl>
+							</FormItem>
+						)}
+					/>
+
+					<FormField
+						name="numberInstallments"
+						control={form.control}
+						render={({ field }) => (
+							<FormItem>
+								<FormLabel>Número de parcelas</FormLabel>
+								<FormControl>
+									<Input
+										{...field}
+										value={field.value ?? ''}
+										disabled={disabled}
+										type="number"
+									/>
+								</FormControl>
+							</FormItem>
+						)}
+					/>
+				</div>
+
+				<FormField
+					name="isEternal"
+					control={form.control}
+					render={({ field }) => (
+						<FormItem>
+							<FormControl>
+								<div className="flex items-center space-x-2">
+									<Checkbox value={field.value} onChange={field.onChange} />
+									<label
+										htmlFor="terms2"
+										className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+									>
+										Despesa eterna
+									</label>
+								</div>
+							</FormControl>
+						</FormItem>
+					)}
+				/>
+
+				<FormField
+					name="isActive"
+					control={form.control}
+					render={({ field }) => (
+						<FormItem>
+							<FormControl>
+								<div className="flex items-center space-x-2">
+									<Checkbox value={field.value} onChange={field.onChange} />
+									<label
+										htmlFor="terms2"
+										className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+									>
+										Despesa ativa
+									</label>
+								</div>
+							</FormControl>
+						</FormItem>
+					)}
+				/>
+
 				<FormField
 					name="categoryId"
 					control={form.control}
@@ -214,26 +233,8 @@ const TransactionForm = ({
 									placeholder="Seleciona uma categoria"
 									options={categoryOptions}
 									onCreate={onCreateCategory}
-									value={field.value ?? ''}
+									value={field.value}
 									onChange={field.onChange}
-								/>
-							</FormControl>
-						</FormItem>
-					)}
-				/>
-
-				<FormField
-					name="document"
-					control={form.control}
-					render={({ field }) => (
-						<FormItem>
-							<FormLabel>Comprovante</FormLabel>
-							<FormControl>
-								<Input
-									{...field}
-									value={field.value ?? ''}
-									disabled={disabled}
-									placeholder="URL do documento"
 								/>
 							</FormControl>
 						</FormItem>
@@ -262,4 +263,4 @@ const TransactionForm = ({
 	)
 }
 
-export default TransactionForm
+export default ExpenseForm

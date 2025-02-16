@@ -1,5 +1,12 @@
 import { relations } from 'drizzle-orm'
-import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+	boolean,
+	integer,
+	pgTable,
+	primaryKey,
+	text,
+	timestamp,
+} from 'drizzle-orm/pg-core'
 import { createInsertSchema } from 'drizzle-zod'
 import { z } from 'zod'
 
@@ -15,13 +22,27 @@ export const categories = pgTable('categories', {
 	userId: text('user_id').notNull(),
 })
 
+export const expenses = pgTable('expenses', {
+	id: text('id').primaryKey(),
+	name: text('name').notNull(),
+	description: text('description'),
+	amount: integer('amount').notNull(),
+	date: timestamp('date', { mode: 'date' }).notNull(),
+	currentInstallment: integer('currentInstallment'),
+	numberInstallments: integer('numberInstallments'),
+	isEternal: boolean('isEternal').notNull(),
+	isActive: boolean('isActive').notNull(),
+	categoryId: text('category_id').references(() => categories.id, {
+		onDelete: 'set null',
+	}),
+})
+
 export const transactions = pgTable('transactions', {
 	id: text('id').primaryKey(),
 	name: text('name').notNull(),
 	description: text('description'),
 	amount: integer('amount').notNull(),
 	date: timestamp('date', { mode: 'date' }).notNull(),
-	category: text('category'),
 	document: text('document'),
 	accountId: text('account_id')
 		.references(() => accounts.id, {
@@ -29,6 +50,9 @@ export const transactions = pgTable('transactions', {
 		})
 		.notNull(),
 	categoryId: text('category_id').references(() => categories.id, {
+		onDelete: 'set null',
+	}),
+	expenseId: text('expense_id').references(() => expenses.id, {
 		onDelete: 'set null',
 	}),
 })
@@ -39,6 +63,7 @@ export const accountsRelations = relations(accounts, ({ many }) => ({
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
 	transactions: many(transactions),
+	expenses: many(expenses),
 }))
 
 export const transactionsRelations = relations(transactions, ({ one }) => ({
@@ -47,7 +72,19 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
 		references: [accounts.id],
 	}),
 	categories: one(categories, {
-		fields: [transactions.accountId],
+		fields: [transactions.categoryId],
+		references: [categories.id],
+	}),
+	expenses: one(expenses, {
+		fields: [transactions.expenseId],
+		references: [expenses.id],
+	}),
+}))
+
+export const expensesRelations = relations(expenses, ({ one, many }) => ({
+	transactions: many(transactions),
+	categories: one(categories, {
+		fields: [expenses.categoryId],
 		references: [categories.id],
 	}),
 }))
@@ -55,5 +92,8 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
 export const insertAccountSchema = createInsertSchema(accounts)
 export const insertCategorySchema = createInsertSchema(categories)
 export const insertTransactionSchema = createInsertSchema(transactions, {
+	date: z.coerce.date(),
+})
+export const insertExpenseSchema = createInsertSchema(expenses, {
 	date: z.coerce.date(),
 })

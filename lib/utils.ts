@@ -20,3 +20,8 @@ export function formatCurrency(value: number) {
 		minimumFractionDigits: 2,
 	}).format(value)
 }
+
+export function convertStringToBoolean(value: string) {
+	const booleanValue = value === '1' || value.toLowerCase() === 'true'
+	return booleanValue
+}
