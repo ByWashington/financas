@@ -9,26 +9,28 @@ import { useCreateAccount } from '@/features/accounts/api/use-create-account'
 import { useGetAccounts } from '@/features/accounts/api/use-get-accounts'
 import { useCreateCategory } from '@/features/categories/api/use-create-category'
 import { useGetCategories } from '@/features/categories/api/use-get-categories'
-import { useGetExpenses } from '@/features/expenses/api/use-get-expenses'
-import { useDeleteTransaction } from '@/features/transactions/api/use-delete-transaction'
-import { useEditTransaction } from '@/features/transactions/api/use-edit-transaction'
-import { useGetTransaction } from '@/features/transactions/api/use-get-transaction'
-import TransactionForm from '@/features/transactions/components/transaction-form'
-import type { ApiFormValues } from '@/features/transactions/components/transaction-form-values'
-import { useOpenTransaction } from '@/features/transactions/hooks/use-open-transaction'
+import { useDeleteExpense } from '@/features/expenses/api/use-delete-expense'
+import { useEditExpense } from '@/features/expenses/api/use-edit-expense'
+import { useGetExpense } from '@/features/expenses/api/use-get-expense'
+import ExpenseForm from '@/features/expenses/components/expense-form'
+import type {
+	ApiFormValues,
+	FormValues,
+} from '@/features/expenses/components/expense-form-values'
+import { useOpenExpense } from '@/features/expenses/hooks/use-open-expense'
 import { useConfirm } from '@/hooks/use-confirm'
 import { Loader2 } from 'lucide-react'
 
-const EditTransactionSheet = () => {
-	const { isOpen, onClose, id } = useOpenTransaction()
+const EditExpenseSheet = () => {
+	const { isOpen, onClose, id } = useOpenExpense()
 	const [ConfirmationDialog, confirm] = useConfirm(
 		'Você tem certeza?',
 		'Não será possível recuperar a conta',
 	)
 
-	const transactionsQuery = useGetTransaction(id)
-	const editMutation = useEditTransaction(id)
-	const deleteMutation = useDeleteTransaction(id)
+	const expensesQuery = useGetExpense(id)
+	const editMutation = useEditExpense(id)
+	const deleteMutation = useDeleteExpense(id)
 
 	const categoryQuery = useGetCategories()
 	const categoryMutation = useCreateCategory()
@@ -44,12 +46,6 @@ const EditTransactionSheet = () => {
 	const accountOptions = (accountQuery.data ?? []).map((account) => ({
 		label: account.name,
 		value: account.id,
-	}))
-
-	const expenseQuery = useGetExpenses()
-	const expenseOptions = (expenseQuery.data ?? []).map((expense) => ({
-		label: expense.name,
-		value: expense.id,
 	}))
 
 	const isPending =
@@ -79,23 +75,22 @@ const EditTransactionSheet = () => {
 	}
 
 	const isLoading =
-		transactionsQuery.isLoading ||
-		categoryQuery.isLoading ||
-		accountQuery.isLoading
+		expensesQuery.isLoading || categoryQuery.isLoading || accountQuery.isLoading
 
-	if (!transactionsQuery || !transactionsQuery.data) {
+	if (!expensesQuery || !expensesQuery.data) {
 		return null
 	}
 
 	const defaultValues = {
-		name: transactionsQuery.data.name,
-		description: transactionsQuery.data.description,
-		date: new Date(transactionsQuery.data.date),
-		amount: transactionsQuery.data.amount.toString(),
-		document: transactionsQuery.data.document,
-		categoryId: transactionsQuery.data.categoryId ?? '',
-		accountId: transactionsQuery.data.accountId ?? '',
-		expenseId: transactionsQuery.data.expenseId ?? '',
+		name: expensesQuery.data.name,
+		description: expensesQuery.data.description,
+		date: new Date(expensesQuery.data.date),
+		amount: expensesQuery.data.amount.toString(),
+		currentInstallment: expensesQuery.data.currentInstallment?.toString(),
+		numberInstallments: expensesQuery.data.numberInstallments?.toString(),
+		isEternal: expensesQuery.data.isEternal.toString(),
+		isActive: expensesQuery.data.isActive.toString(),
+		categoryId: expensesQuery.data.categoryId,
 	}
 
 	return (
@@ -106,7 +101,7 @@ const EditTransactionSheet = () => {
 					<SheetHeader>
 						<SheetTitle>Alterar</SheetTitle>
 						<SheetDescription>
-							Gerencie as suas transações cadastradas
+							Gerencie as suas despesas cadastradas
 						</SheetDescription>
 					</SheetHeader>
 					{isLoading ? (
@@ -114,7 +109,7 @@ const EditTransactionSheet = () => {
 							<Loader2 className="size-4 text-muted-foreground animate-spin" />
 						</div>
 					) : (
-						<TransactionForm
+						<ExpenseForm
 							onSubmit={onSubmit}
 							disabled={isPending}
 							defaultValues={defaultValues}
@@ -122,9 +117,6 @@ const EditTransactionSheet = () => {
 							onDelete={onDelete}
 							categoryOptions={categoryOptions}
 							onCreateCategory={onCreateCategory}
-							accountOptions={accountOptions}
-							onCreateAccount={onCreateAccount}
-							expenseOptions={expenseOptions}
 						/>
 					)}
 				</SheetContent>
@@ -133,4 +125,4 @@ const EditTransactionSheet = () => {
 	)
 }
 
-export default EditTransactionSheet
+export default EditExpenseSheet

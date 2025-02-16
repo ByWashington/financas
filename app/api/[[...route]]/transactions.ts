@@ -4,6 +4,7 @@ import { db } from '@/db/drizzle'
 import {
 	accounts,
 	categories,
+	expenses,
 	insertTransactionSchema,
 	transactions,
 } from '@/db/schema'
@@ -54,10 +55,13 @@ const app = new Hono()
 					categoryId: transactions.categoryId,
 					account: accounts.name,
 					accountId: transactions.accountId,
+					expense: expenses.name,
+					expenseId: transactions.expenseId,
 				})
 				.from(transactions)
 				.innerJoin(accounts, eq(transactions.accountId, accounts.id))
 				.leftJoin(categories, eq(transactions.categoryId, categories.id))
+				.leftJoin(expenses, eq(transactions.expenseId, expenses.id))
 				.where(
 					and(
 						accountId ? eq(transactions.accountId, accountId) : undefined,
@@ -102,6 +106,7 @@ const app = new Hono()
 					document: transactions.document,
 					categoryId: transactions.categoryId,
 					accountId: transactions.accountId,
+					expenseId: transactions.expenseId,
 				})
 				.from(transactions)
 				.innerJoin(accounts, eq(transactions.accountId, accounts.id))
@@ -139,6 +144,33 @@ const app = new Hono()
 					...values,
 				})
 				.returning()
+
+			if (values.expenseId) {
+				const itemsWithExpense = await db
+					.select({
+						id: transactions.id,
+					})
+					.from(transactions)
+					.innerJoin(expenses, eq(transactions.expenseId, expenses.id))
+
+				const expenseToUpdate = db
+					.$with('expense_to_update')
+					.as(
+						db
+							.select({ id: expenses.id })
+							.from(expenses)
+							.where(eq(expenses.id, values.expenseId)),
+					)
+
+				await db
+					.with(expenseToUpdate)
+					.update(expenses)
+					.set({
+						currentInstallment: itemsWithExpense.length,
+					})
+					.where(inArray(expenses.id, sql`(select id from ${expenseToUpdate})`))
+					.returning()
+			}
 
 			return c.json({ data })
 		},
