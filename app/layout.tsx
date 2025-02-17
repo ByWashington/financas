@@ -28,18 +28,18 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<Suspense>
-			<ClerkProvider localization={ptBR}>
-				<html lang="pt">
-					<body className={`${poppinsFont.variable}`} suppressHydrationWarning>
+		<ClerkProvider localization={ptBR}>
+			<html lang="pt">
+				<body className={`${poppinsFont.variable}`} suppressHydrationWarning>
+					<Suspense>
 						<QueryProvider>
 							<SheetProvider />
 							<Toaster />
 							{children}
 						</QueryProvider>
-					</body>
-				</html>
-			</ClerkProvider>
-		</Suspense>
+					</Suspense>
+				</body>
+			</html>
+		</ClerkProvider>
 	)
 }
