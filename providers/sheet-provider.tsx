@@ -13,14 +13,14 @@ import NewTransactionSheet from '@/features/transactions/components/new-transact
 import { useAuth } from '@clerk/nextjs'
 
 const SheetProvider = () => {
-	const { userId } = useAuth()
-	if (!userId) return
-
 	const isMounted = useMountedState()
 
 	if (!isMounted) {
 		return null
 	}
+
+	const { userId } = useAuth()
+	if (!userId) return
 
 	return (
 		<>
