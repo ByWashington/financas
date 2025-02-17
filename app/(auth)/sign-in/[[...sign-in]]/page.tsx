@@ -1,6 +1,8 @@
-import { ClerkLoaded, ClerkLoading, SignIn } from '@clerk/nextjs';
-import { Loader2 } from 'lucide-react';
-import Image from 'next/image';
+'use client'
+
+import { ClerkLoaded, ClerkLoading, SignIn } from '@clerk/nextjs'
+import { Loader2 } from 'lucide-react'
+import Image from 'next/image'
 
 export default function Page() {
 	return (
@@ -25,5 +27,5 @@ export default function Page() {
 				<Image src={'/logo.svg'} height={100} width={100} alt="logo" />
 			</div>
 		</div>
-	);
+	)
 }

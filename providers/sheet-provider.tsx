@@ -10,8 +10,12 @@ import EditExpenseSheet from '@/features/expenses/components/edit-expense-sheet'
 import NewExpenseSheet from '@/features/expenses/components/new-expense-sheet'
 import EditTransactionSheet from '@/features/transactions/components/edit-transaction-sheet'
 import NewTransactionSheet from '@/features/transactions/components/new-transaction-sheet'
+import { useAuth } from '@clerk/nextjs'
 
 const SheetProvider = () => {
+	const { userId } = useAuth()
+	if (!userId) return
+
 	const isMounted = useMountedState()
 
 	if (!isMounted) {
