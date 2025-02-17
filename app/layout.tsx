@@ -28,7 +28,7 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<ClerkProvider localization={ptBR}>
+		<ClerkProvider localization={ptBR} waitlistUrl="/waitlist">
 			<html lang="pt">
 				<body className={`${poppinsFont.variable}`} suppressHydrationWarning>
 					<Suspense>
