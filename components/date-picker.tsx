@@ -47,7 +47,6 @@ export const DatePicker = ({
 					selected={value}
 					onSelect={onChange}
 					disabled={disabled}
-					initialFocus
 					locale={ptBR}
 				/>
 			</PopoverContent>
