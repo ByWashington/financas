@@ -8,6 +8,7 @@ import { QueryProvider } from '@/providers/query-provider'
 import SheetProvider from '@/providers/sheet-provider'
 
 import { Toaster } from '@/components/ui/sonner'
+import { Suspense } from 'react'
 
 const poppinsFont = Poppins({
 	weight: '400',
@@ -27,16 +28,18 @@ export default function RootLayout({
 	children: React.ReactNode
 }>) {
 	return (
-		<ClerkProvider localization={ptBR}>
-			<html lang="pt">
-				<body className={`${poppinsFont.variable}`} suppressHydrationWarning>
-					<QueryProvider>
-						<SheetProvider />
-						<Toaster />
-						{children}
-					</QueryProvider>
-				</body>
-			</html>
-		</ClerkProvider>
+		<Suspense>
+			<ClerkProvider localization={ptBR}>
+				<html lang="pt">
+					<body className={`${poppinsFont.variable}`} suppressHydrationWarning>
+						<QueryProvider>
+							<SheetProvider />
+							<Toaster />
+							{children}
+						</QueryProvider>
+					</body>
+				</html>
+			</ClerkProvider>
+		</Suspense>
 	)
 }

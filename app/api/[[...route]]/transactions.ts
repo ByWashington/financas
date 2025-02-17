@@ -275,7 +275,7 @@ const app = new Hono()
 				}
 
 				return c.json({ data })
-			} catch (error) {
+			} catch {
 				return c.json({ error: 'Internal server error' }, 500)
 			}
 		},
@@ -331,7 +331,7 @@ const app = new Hono()
 				}
 
 				return c.json({ data })
-			} catch (error) {
+			} catch {
 				return c.json({ error: 'Internal server error' }, 500)
 			}
 		},
