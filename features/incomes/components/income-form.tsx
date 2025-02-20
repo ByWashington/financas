@@ -16,7 +16,7 @@ import {
 	type ApiFormValues,
 	type FormValues,
 	formSchema,
-} from '@/features/expenses/components/expense-form-values'
+} from '@/features/incomes/components/income-form-values'
 import { convertAmountToMiliunits, convertStringToBoolean } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Trash } from 'lucide-react'
@@ -32,7 +32,7 @@ type Props = {
 	onCreateCategory: (name: string) => void
 }
 
-const ExpenseForm = ({
+const IncomeForm = ({
 	id,
 	defaultValues,
 	onSubmit,
@@ -83,7 +83,7 @@ const ExpenseForm = ({
 									{...field}
 									value={field.value ?? ''}
 									disabled={disabled}
-									placeholder="Conta de internet..."
+									placeholder="Salário..."
 								/>
 							</FormControl>
 						</FormItem>
@@ -101,7 +101,7 @@ const ExpenseForm = ({
 									{...field}
 									value={field.value ?? ''}
 									disabled={disabled}
-									placeholder="Conta de internet do mês de janeiro..."
+									placeholder="Salário Superlógica..."
 								/>
 							</FormControl>
 						</FormItem>
@@ -137,7 +137,7 @@ const ExpenseForm = ({
 										field.onChange(x)
 									}}
 									disabled={disabled}
-									placeholder="Data de pagamento"
+									placeholder="Data de recebimento"
 								/>
 							</FormControl>
 						</FormItem>
@@ -197,7 +197,7 @@ const ExpenseForm = ({
 										htmlFor="terms2"
 										className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 									>
-										Despesa eterna
+										Rendimento eterno
 									</label>
 								</div>
 							</FormControl>
@@ -220,7 +220,7 @@ const ExpenseForm = ({
 										htmlFor="terms2"
 										className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
 									>
-										Despesa ativa
+										Rendimento ativo
 									</label>
 								</div>
 							</FormControl>
@@ -269,4 +269,4 @@ const ExpenseForm = ({
 	)
 }
 
-export default ExpenseForm
+export default IncomeForm

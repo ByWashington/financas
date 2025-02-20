@@ -4,30 +4,31 @@ import type { InferRequestType, InferResponseType } from 'hono'
 import { toast } from 'sonner'
 
 type ResponseType = InferResponseType<
-	(typeof client.api.expenses)['bulk-delete']['$post']
+	(typeof client.api.incomes)[':id']['$patch']
 >
 type RequestType = InferRequestType<
-	(typeof client.api.expenses)['bulk-delete']['$post']
+	(typeof client.api.incomes)[':id']['$patch']
 >['json']
 
-export const useBulkDeleteExpenses = () => {
+export const useEditIncome = (id?: string) => {
 	const queryClient = useQueryClient()
 
 	const mutation = useMutation<ResponseType, Error, RequestType>({
 		mutationFn: async (json) => {
-			const response = await client.api.expenses['bulk-delete'].$post({
+			const response = await client.api.incomes[':id'].$patch({
 				json,
+				param: { id },
 			})
+
 			return await response.json()
 		},
 		onSuccess: () => {
-			toast.success('Exclusão realizada com sucesso!')
-			queryClient.invalidateQueries({ queryKey: ['expenses'] })
+			toast.success('Receita alterada com sucesso!')
+			queryClient.invalidateQueries({ queryKey: ['income', { id }] })
+			queryClient.invalidateQueries({ queryKey: ['incomes'] })
 		},
 		onError: () => {
-			toast.error(
-				'Erro ao tentar excluir o(s) registro(s), tente novamente mais tarde!',
-			)
+			toast.error('Erro ao alterar a receita, tente novamente mais tarde!')
 		},
 	})
 

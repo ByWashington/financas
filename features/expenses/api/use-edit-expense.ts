@@ -28,7 +28,7 @@ export const useEditExpense = (id?: string) => {
 			queryClient.invalidateQueries({ queryKey: ['expenses'] })
 		},
 		onError: () => {
-			toast.error('Erro ao alterar a transação, tente novamente mais tarde!')
+			toast.error('Erro ao alterar a despesa, tente novamente mais tarde!')
 		},
 	})
 

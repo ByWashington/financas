@@ -1,4 +1,4 @@
-import { insertExpenseSchema } from '@/db/schema'
+import { insertIncomeSchema } from '@/db/schema'
 import { z } from 'zod'
 
 const formSchema = z.object({
@@ -13,7 +13,7 @@ const formSchema = z.object({
 	categoryId: z.string().nullable().optional(),
 })
 
-const apiSchema = insertExpenseSchema.omit({
+const apiSchema = insertIncomeSchema.omit({
 	id: true,
 })
 
