@@ -6,13 +6,11 @@ import { z } from 'zod'
 export const accounts = pgTable('accounts', {
 	id: text('id').primaryKey(),
 	name: text('name').notNull(),
-	userId: text('user_id').notNull(),
 })
 
 export const categories = pgTable('categories', {
 	id: text('id').primaryKey(),
 	name: text('name').notNull(),
-	userId: text('user_id').notNull(),
 })
 
 export const expenses = pgTable('expenses', {
@@ -21,10 +19,25 @@ export const expenses = pgTable('expenses', {
 	description: text('description'),
 	amount: integer('amount').notNull(),
 	date: timestamp('date', { mode: 'date' }).notNull(),
-	currentInstallment: integer('currentInstallment'),
-	numberInstallments: integer('numberInstallments'),
-	isEternal: boolean('isEternal').notNull(),
-	isActive: boolean('isActive').notNull(),
+	currentInstallment: integer('current_installment'),
+	numberInstallments: integer('number_installments'),
+	isEternal: boolean('is_eternal').notNull(),
+	isActive: boolean('is_active').notNull(),
+	categoryId: text('category_id').references(() => categories.id, {
+		onDelete: 'set null',
+	}),
+})
+
+export const incomes = pgTable('incomes', {
+	id: text('id').primaryKey(),
+	name: text('name').notNull(),
+	description: text('description'),
+	amount: integer('amount').notNull(),
+	date: timestamp('date', { mode: 'date' }).notNull(),
+	currentInstallment: integer('current_installment'),
+	numberInstallments: integer('number_installments'),
+	isEternal: boolean('is_eternal').notNull(),
+	isActive: boolean('is_active').notNull(),
 	categoryId: text('category_id').references(() => categories.id, {
 		onDelete: 'set null',
 	}),
@@ -38,9 +51,7 @@ export const transactions = pgTable('transactions', {
 	date: timestamp('date', { mode: 'date' }).notNull(),
 	document: text('document'),
 	accountId: text('account_id')
-		.references(() => accounts.id, {
-			onDelete: 'cascade',
-		})
+		.references(() => accounts.id, { onDelete: 'cascade' })
 		.notNull(),
 	categoryId: text('category_id').references(() => categories.id, {
 		onDelete: 'set null',
@@ -50,6 +61,7 @@ export const transactions = pgTable('transactions', {
 	}),
 })
 
+// 🔹 Relacionamentos
 export const accountsRelations = relations(accounts, ({ many }) => ({
 	transactions: many(transactions),
 }))
@@ -57,6 +69,7 @@ export const accountsRelations = relations(accounts, ({ many }) => ({
 export const categoriesRelations = relations(categories, ({ many }) => ({
 	transactions: many(transactions),
 	expenses: many(expenses),
+	incomes: many(incomes),
 }))
 
 export const transactionsRelations = relations(transactions, ({ one }) => ({
@@ -64,11 +77,11 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
 		fields: [transactions.accountId],
 		references: [accounts.id],
 	}),
-	categories: one(categories, {
+	category: one(categories, {
 		fields: [transactions.categoryId],
 		references: [categories.id],
 	}),
-	expenses: one(expenses, {
+	expense: one(expenses, {
 		fields: [transactions.expenseId],
 		references: [expenses.id],
 	}),
@@ -76,17 +89,35 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
 
 export const expensesRelations = relations(expenses, ({ one, many }) => ({
 	transactions: many(transactions),
-	categories: one(categories, {
+	category: one(categories, {
 		fields: [expenses.categoryId],
+		references: [categories.id],
+	}),
+}))
+
+export const incomesRelations = relations(incomes, ({ one }) => ({
+	category: one(categories, {
+		fields: [incomes.categoryId],
 		references: [categories.id],
 	}),
 }))
 
 export const insertAccountSchema = createInsertSchema(accounts)
 export const insertCategorySchema = createInsertSchema(categories)
+
 export const insertTransactionSchema = createInsertSchema(transactions, {
 	date: z.coerce.date(),
+	categoryId: z.string().nullable().optional(),
+	expenseId: z.string().nullable().optional(),
+	document: z.string().nullable().optional(),
 })
+
 export const insertExpenseSchema = createInsertSchema(expenses, {
 	date: z.coerce.date(),
+	categoryId: z.string().nullable().optional(),
+})
+
+export const insertIncomeSchema = createInsertSchema(incomes, {
+	date: z.coerce.date(),
+	categoryId: z.string().nullable().optional(),
 })
