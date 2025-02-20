@@ -2,7 +2,7 @@ import { client } from '@/lib/hono'
 import { convertAmountFromMiliunits } from '@/lib/utils'
 import { useQuery } from '@tanstack/react-query'
 
-export const useGetExpense = (id?: string) => {
+export const useGetExpense = (id: string) => {
 	const query = useQuery({
 		enabled: !!id,
 		queryKey: ['expenses', { id }],

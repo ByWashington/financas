@@ -10,7 +10,7 @@ type RequestType = InferRequestType<
 	(typeof client.api.incomes)[':id']['$patch']
 >['json']
 
-export const useEditIncome = (id?: string) => {
+export const useEditIncome = (id: string) => {
 	const queryClient = useQueryClient()
 
 	const mutation = useMutation<ResponseType, Error, RequestType>({

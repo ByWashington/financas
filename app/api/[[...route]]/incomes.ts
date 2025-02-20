@@ -59,12 +59,7 @@ const app = new Hono()
 	)
 	.get(
 		'/:id',
-		zValidator(
-			'param',
-			z.object({
-				id: z.string().optional(),
-			}),
-		),
+		zValidator('param', z.object({ id: z.string().min(1, 'ID inválido') })),
 		async (c) => {
 			const auth = getAuth(c)
 
@@ -133,9 +128,7 @@ const app = new Hono()
 		'/bulk-delete',
 		zValidator(
 			'json',
-			z.object({
-				ids: z.array(z.string()),
-			}),
+			z.object({ ids: z.array(z.string()).min(1, 'Lista de IDs inválida') }),
 		),
 		async (c) => {
 			const auth = getAuth(c)
@@ -167,12 +160,7 @@ const app = new Hono()
 	)
 	.patch(
 		'/:id',
-		zValidator(
-			'param',
-			z.object({
-				id: z.string().optional(),
-			}),
-		),
+		zValidator('param', z.object({ id: z.string().min(1, 'ID inválido') })),
 		zValidator(
 			'json',
 			insertIncomeSchema.omit({
@@ -189,10 +177,6 @@ const app = new Hono()
 
 				const { id } = c.req.valid('param')
 				const values = c.req.valid('json')
-
-				if (!id) {
-					return c.json({ error: 'Not found' }, 404)
-				}
 
 				const incomesToUpdate = db
 					.$with('incomes_to_update')
@@ -222,12 +206,7 @@ const app = new Hono()
 	)
 	.delete(
 		'/:id',
-		zValidator(
-			'param',
-			z.object({
-				id: z.string().optional(),
-			}),
-		),
+		zValidator('param', z.object({ id: z.string().min(1, 'ID inválido') })),
 		async (c) => {
 			try {
 				const auth = getAuth(c)
@@ -237,10 +216,6 @@ const app = new Hono()
 				}
 
 				const { id } = c.req.valid('param')
-
-				if (!id) {
-					return c.json({ error: 'Not found' }, 404)
-				}
 
 				const incomesToDelete = db
 					.$with('incomes_to_delete')
