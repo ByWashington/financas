@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 
 import { db } from '@/db/drizzle'
-import { categories, expenses, insertExpenseSchema } from '@/db/schema'
+import { categories, incomes, insertIncomeSchema } from '@/db/schema'
 import { getAuth } from '@hono/clerk-auth'
 import { zValidator } from '@hono/zod-validator'
 import { createId } from '@paralleldrive/cuid2'
@@ -28,33 +28,31 @@ const app = new Hono()
 			const { isActive, name } = c.req.valid('query')
 
 			const isActiveFilter = isActive
-				? eq(expenses.isActive, Boolean(isActive === '1'))
+				? eq(incomes.isActive, Boolean(isActive === '1'))
 				: undefined
 
-			const searchNameTerm = name
-				? ilike(expenses.name, `%${name}%`)
-				: undefined
+			const searchNameTerm = name ? ilike(incomes.name, `%${name}%`) : undefined
 
 			const filters = [isActiveFilter, searchNameTerm].filter(Boolean)
 
 			const data = await db
 				.select({
-					id: expenses.id,
-					name: expenses.name,
-					description: expenses.description,
-					amount: expenses.amount,
-					date: expenses.date,
+					id: incomes.id,
+					name: incomes.name,
+					description: incomes.description,
+					amount: incomes.amount,
+					date: incomes.date,
 					category: categories.name,
-					categoryId: expenses.categoryId,
-					currentInstallment: expenses.currentInstallment,
-					numberInstallments: expenses.numberInstallments,
-					isEternal: expenses.isEternal,
-					isActive: expenses.isActive,
+					categoryId: incomes.categoryId,
+					currentInstallment: incomes.currentInstallment,
+					numberInstallments: incomes.numberInstallments,
+					isEternal: incomes.isEternal,
+					isActive: incomes.isActive,
 				})
-				.from(expenses)
-				.leftJoin(categories, eq(expenses.categoryId, categories.id))
+				.from(incomes)
+				.leftJoin(categories, eq(incomes.categoryId, categories.id))
 				.where(filters.length > 0 ? and(...filters) : undefined)
-				.orderBy(desc(expenses.date))
+				.orderBy(desc(incomes.date))
 
 			return c.json({ data })
 		},
@@ -82,19 +80,19 @@ const app = new Hono()
 
 			const [data] = await db
 				.select({
-					id: expenses.id,
-					name: expenses.name,
-					description: expenses.description,
-					amount: expenses.amount,
-					date: expenses.date,
-					categoryId: expenses.categoryId,
-					currentInstallment: expenses.currentInstallment,
-					numberInstallments: expenses.numberInstallments,
-					isEternal: expenses.isEternal,
-					isActive: expenses.isActive,
+					id: incomes.id,
+					name: incomes.name,
+					description: incomes.description,
+					amount: incomes.amount,
+					date: incomes.date,
+					categoryId: incomes.categoryId,
+					currentInstallment: incomes.currentInstallment,
+					numberInstallments: incomes.numberInstallments,
+					isEternal: incomes.isEternal,
+					isActive: incomes.isActive,
 				})
-				.from(expenses)
-				.where(eq(expenses.id, id))
+				.from(incomes)
+				.where(eq(incomes.id, id))
 
 			if (!data) {
 				return c.json({ error: 'Not found' }, 404)
@@ -107,7 +105,7 @@ const app = new Hono()
 		'/',
 		zValidator(
 			'json',
-			insertExpenseSchema.omit({
+			insertIncomeSchema.omit({
 				id: true,
 			}),
 		),
@@ -121,7 +119,7 @@ const app = new Hono()
 			const values = c.req.valid('json')
 
 			const [data] = await db
-				.insert(expenses)
+				.insert(incomes)
 				.values({
 					id: createId(),
 					...values,
@@ -147,21 +145,21 @@ const app = new Hono()
 			}
 
 			const values = c.req.valid('json')
-			const expensesToDelete = db
-				.$with('expenses_to_delete')
+			const incomesToDelete = db
+				.$with('incomes_to_delete')
 				.as(
 					db
-						.select({ id: expenses.id })
-						.from(expenses)
-						.where(inArray(expenses.id, values.ids)),
+						.select({ id: incomes.id })
+						.from(incomes)
+						.where(inArray(incomes.id, values.ids)),
 				)
 
 			const data = await db
-				.with(expensesToDelete)
-				.delete(expenses)
-				.where(inArray(expenses.id, sql`(select id from ${expensesToDelete})`))
+				.with(incomesToDelete)
+				.delete(incomes)
+				.where(inArray(incomes.id, sql`(select id from ${incomesToDelete})`))
 				.returning({
-					id: expenses.id,
+					id: incomes.id,
 				})
 
 			return c.json({ data })
@@ -177,7 +175,7 @@ const app = new Hono()
 		),
 		zValidator(
 			'json',
-			insertExpenseSchema.omit({
+			insertIncomeSchema.omit({
 				id: true,
 			}),
 		),
@@ -196,22 +194,20 @@ const app = new Hono()
 					return c.json({ error: 'Not found' }, 404)
 				}
 
-				const expensesToUpdate = db
-					.$with('expenses_to_update')
+				const incomesToUpdate = db
+					.$with('incomes_to_update')
 					.as(
 						db
-							.select({ id: expenses.id })
-							.from(expenses)
-							.where(eq(expenses.id, id)),
+							.select({ id: incomes.id })
+							.from(incomes)
+							.where(eq(incomes.id, id)),
 					)
 
 				const [data] = await db
-					.with(expensesToUpdate)
-					.update(expenses)
+					.with(incomesToUpdate)
+					.update(incomes)
 					.set(values)
-					.where(
-						inArray(expenses.id, sql`(select id from ${expensesToUpdate})`),
-					)
+					.where(inArray(incomes.id, sql`(select id from ${incomesToUpdate})`))
 					.returning()
 
 				if (!data) {
@@ -246,23 +242,21 @@ const app = new Hono()
 					return c.json({ error: 'Not found' }, 404)
 				}
 
-				const expensesToDelete = db
-					.$with('expenses_to_delete')
+				const incomesToDelete = db
+					.$with('incomes_to_delete')
 					.as(
 						db
-							.select({ id: expenses.id })
-							.from(expenses)
-							.where(eq(expenses.id, id)),
+							.select({ id: incomes.id })
+							.from(incomes)
+							.where(eq(incomes.id, id)),
 					)
 
 				const [data] = await db
-					.with(expensesToDelete)
-					.delete(expenses)
-					.where(
-						inArray(expenses.id, sql`(select id from ${expensesToDelete})`),
-					)
+					.with(incomesToDelete)
+					.delete(incomes)
+					.where(inArray(incomes.id, sql`(select id from ${incomesToDelete})`))
 					.returning({
-						id: expenses.id,
+						id: incomes.id,
 					})
 
 				if (!data) {

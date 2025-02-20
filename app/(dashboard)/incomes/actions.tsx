@@ -7,8 +7,8 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useDeleteExpense } from '@/features/expenses/api/use-delete-expense'
-import { useOpenExpense } from '@/features/expenses/hooks/use-open-expense'
+import { useDeleteIncome } from '@/features/incomes/api/use-delete-income'
+import { useOpenIncome } from '@/features/incomes/hooks/use-open-income'
 import { useConfirm } from '@/hooks/use-confirm'
 import { Edit, MoreHorizontal, Trash } from 'lucide-react'
 
@@ -17,14 +17,14 @@ type Props = {
 }
 
 export const Actions = ({ id }: Props) => {
-	const deleteMutation = useDeleteExpense(id)
+	const deleteMutation = useDeleteIncome(id)
 
 	const [ConfirmationDialog, confirm] = useConfirm(
 		'Você tem certeza?',
-		'Não será possível recuperar a despesa',
+		'Não será possível recuperar a receita',
 	)
 
-	const { onOpen } = useOpenExpense()
+	const { onOpen } = useOpenIncome()
 
 	const onDelete = async () => {
 		const ok = await confirm()

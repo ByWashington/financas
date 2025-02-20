@@ -8,6 +8,8 @@ import EditCategorySheet from '@/features/categories/components/edit-category-sh
 import NewCategorySheet from '@/features/categories/components/new-category-sheet'
 import EditExpenseSheet from '@/features/expenses/components/edit-expense-sheet'
 import NewExpenseSheet from '@/features/expenses/components/new-expense-sheet'
+import EditIncomeSheet from '@/features/incomes/components/edit-income-sheet'
+import NewIncomeSheet from '@/features/incomes/components/new-income-sheet'
 import EditTransactionSheet from '@/features/transactions/components/edit-transaction-sheet'
 import NewTransactionSheet from '@/features/transactions/components/new-transaction-sheet'
 import { useAuth } from '@clerk/nextjs'
@@ -32,6 +34,8 @@ const SheetProvider = () => {
 			<NewTransactionSheet />
 			<EditExpenseSheet />
 			<NewExpenseSheet />
+			<EditIncomeSheet />
+			<NewIncomeSheet />
 		</>
 	)
 }

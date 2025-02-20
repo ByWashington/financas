@@ -18,6 +18,10 @@ import { useMedia } from 'react-use'
 
 const routes = [
 	{
+		href: '/',
+		label: 'Dashboard',
+	},
+	{
 		href: '/transactions',
 		label: 'Transações',
 	},
@@ -26,8 +30,8 @@ const routes = [
 		label: 'Despesas',
 	},
 	{
-		href: '/income',
-		label: 'Receita',
+		href: '/incomes',
+		label: 'Receitas',
 	},
 	{
 		href: '/accounts',
@@ -37,10 +41,10 @@ const routes = [
 		href: '/categories',
 		label: 'Categorias',
 	},
-	{
-		href: '/settings',
-		label: 'Configurações',
-	},
+	// {
+	// 	href: '/settings',
+	// 	label: 'Configurações',
+	// },
 ]
 
 const Navigation = () => {
