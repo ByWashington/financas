@@ -7,7 +7,7 @@ type ResponseType = InferResponseType<
 	(typeof client.api.incomes)[':id']['$delete']
 >
 
-export const useDeleteIncome = (id?: string) => {
+export const useDeleteIncome = (id: string) => {
 	const queryClient = useQueryClient()
 
 	const mutation = useMutation<ResponseType, Error>({
