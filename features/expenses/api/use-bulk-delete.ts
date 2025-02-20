@@ -4,10 +4,10 @@ import type { InferRequestType, InferResponseType } from 'hono'
 import { toast } from 'sonner'
 
 type ResponseType = InferResponseType<
-	(typeof client.api.transactions)['bulk-delete']['$post']
+	(typeof client.api.expenses)['bulk-delete']['$post']
 >
 type RequestType = InferRequestType<
-	(typeof client.api.transactions)['bulk-delete']['$post']
+	(typeof client.api.expenses)['bulk-delete']['$post']
 >['json']
 
 export const useBulkDeleteExpenses = () => {
@@ -15,14 +15,14 @@ export const useBulkDeleteExpenses = () => {
 
 	const mutation = useMutation<ResponseType, Error, RequestType>({
 		mutationFn: async (json) => {
-			const response = await client.api.transactions['bulk-delete'].$post({
+			const response = await client.api.expenses['bulk-delete'].$post({
 				json,
 			})
 			return await response.json()
 		},
 		onSuccess: () => {
 			toast.success('Exclusão realizada com sucesso!')
-			queryClient.invalidateQueries({ queryKey: ['transactions'] })
+			queryClient.invalidateQueries({ queryKey: ['expenses'] })
 		},
 		onError: () => {
 			toast.error(

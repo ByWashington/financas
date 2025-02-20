@@ -8,8 +8,8 @@ const formSchema = z.object({
 	date: z.coerce.date(),
 	currentInstallment: z.string().nullable().optional(),
 	numberInstallments: z.string().nullable().optional(),
-	isEternal: z.string(),
-	isActive: z.string(),
+	isEternal: z.string().nullable().optional(),
+	isActive: z.string().nullable().optional(),
 	categoryId: z.string().nullable().optional(),
 })
 

@@ -56,8 +56,8 @@ const ExpenseForm = ({
 			...values,
 			currentInstallment: Number.parseFloat(values.currentInstallment ?? '0'),
 			numberInstallments: Number.parseFloat(values.numberInstallments ?? '0'),
-			isEternal: convertStringToBoolean(values.isEternal),
-			isActive: convertStringToBoolean(values.isActive),
+			isEternal: convertStringToBoolean(values.isEternal ?? '0'),
+			isActive: convertStringToBoolean(values.isActive ?? '0'),
 			amount: amountInMiliunits,
 		})
 	}
@@ -189,7 +189,10 @@ const ExpenseForm = ({
 						<FormItem>
 							<FormControl>
 								<div className="flex items-center space-x-2">
-									<Checkbox value={field.value} onChange={field.onChange} />
+									<Checkbox
+										value={field.value ?? '0'}
+										onChange={field.onChange}
+									/>
 									<label
 										htmlFor="terms2"
 										className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
@@ -209,7 +212,10 @@ const ExpenseForm = ({
 						<FormItem>
 							<FormControl>
 								<div className="flex items-center space-x-2">
-									<Checkbox value={field.value} onChange={field.onChange} />
+									<Checkbox
+										value={field.value ?? '0'}
+										onChange={field.onChange}
+									/>
 									<label
 										htmlFor="terms2"
 										className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"

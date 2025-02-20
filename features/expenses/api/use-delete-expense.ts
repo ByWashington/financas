@@ -24,7 +24,7 @@ export const useDeleteExpense = (id?: string) => {
 			queryClient.invalidateQueries({ queryKey: ['expenses'] })
 		},
 		onError: () => {
-			toast.error('Erro ao excluir a transação, tente novamente mais tarde!')
+			toast.error('Erro ao excluir a despesa, tente novamente mais tarde!')
 		},
 	})
 
