@@ -77,7 +77,7 @@ const ExpenseForm = ({
 					control={form.control}
 					render={({ field }) => (
 						<FormItem>
-							<FormLabel>Name</FormLabel>
+							<FormLabel>Nome</FormLabel>
 							<FormControl>
 								<Input
 									{...field}
@@ -86,6 +86,7 @@ const ExpenseForm = ({
 									placeholder="Conta de internet..."
 								/>
 							</FormControl>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
@@ -104,6 +105,7 @@ const ExpenseForm = ({
 									placeholder="Conta de internet do mês de janeiro..."
 								/>
 							</FormControl>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
@@ -121,6 +123,7 @@ const ExpenseForm = ({
 									placeholder="R$ 0,00"
 								/>
 							</FormControl>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
@@ -140,6 +143,7 @@ const ExpenseForm = ({
 									placeholder="Data de pagamento"
 								/>
 							</FormControl>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
@@ -243,6 +247,7 @@ const ExpenseForm = ({
 									onChange={field.onChange}
 								/>
 							</FormControl>
+							<FormMessage />
 						</FormItem>
 					)}
 				/>
